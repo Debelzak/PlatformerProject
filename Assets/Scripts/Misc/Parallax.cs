@@ -5,74 +5,105 @@ using UnityEngine;
 public class Parallax : MonoBehaviour
 {
     //Config
-    public enum parallaxCameraType{Real,Simulated}
+    [Header("Parallax speed")]
+    [Range(-1.0f,1.0f)]
+    public float XModifier;
+    [Range(-1.0f,1.0f)]
+    public float YModifier;
 
-    public parallaxCameraType cameraType;
-    public float simulatedCameraSpeed;
-
-    public bool lockXPosition;
-    public bool lockYPosition;
-
-    Transform cam;
-    CameraFollow cameraFollow;
-    Vector3 camInitialPosition;
-    Vector3 initialPosition;
-    Vector3 targetPosition;
-    Bounds areaBounds;
-
-    float parallaxFactor;
-
-    void OnEnable()
+    private Vector2 parallaxModifier 
     {
-        cam = Camera.main.transform;
-        cameraFollow = cam.GetComponent<CameraFollow>();
-
-        camInitialPosition = cam.position;
-        initialPosition = transform.position;
-    }
-
-    void Update()
-    { 
-        if(GameManager.instance.playerArea == gameObject.transform.parent.gameObject.transform.parent.gameObject) {
-            //HandleParallax
-            targetPosition = transform.position;
-            parallaxFactor = transform.position.z / 10;
-
-            //Real camera parallax
-            if(cameraType == parallaxCameraType.Real) {
-                targetPosition.x = initialPosition.x + (cam.position.x - camInitialPosition.x) * parallaxFactor;
-                targetPosition.y = initialPosition.y + (cam.position.y - camInitialPosition.y) * parallaxFactor;
-            }
-
-            //Simulated camera parallax
-            if(cameraType == parallaxCameraType.Simulated) {
-                areaBounds = cameraFollow.GetBoundaries();
-
-                if(parallaxFactor < 0) {
-                    parallaxFactor = Mathf.Abs(parallaxFactor) + 10;
-                }
-
-                if(transform.position.x <= areaBounds.min.x) {
-                    transform.position = new Vector3(areaBounds.max.x, transform.position.y, transform.position.z);
-                }
-
-                targetPosition.x = transform.position.x - (simulatedCameraSpeed * parallaxFactor * Time.deltaTime);
-                targetPosition.y = transform.position.y;
-            }
-
-
-            if(lockXPosition)
-                targetPosition.x = initialPosition.x;
-            if(lockYPosition)
-                targetPosition.y = initialPosition.y;
-
-            transform.position = new Vector3(targetPosition.x, targetPosition.y, transform.position.z);
-        } else {
-            Reset();
+        get {
+            return new Vector2(XModifier, YModifier);
         }
     }
 
-    void Reset() {
-        transform.position = initialPosition;
+    [Header("Options")]
+    public bool infiniteScroll;
+    public bool autoScroll;
+    public Vector2 autoScrollSpeed;
+
+    //Private
+    private bool active;
+
+    private GameObject thisArea;
+    private Transform cam;
+    private CameraFollow cameraFollow;
+    private Vector3 camSize => cameraFollow.GetCameraSize();
+    private Vector3 camStartPos;
+    private Bounds areaBounds;
+
+    private Vector3 originalPos;
+    private Vector3 startPos;
+    private Vector3 length;
+
+    private Vector2 moveAmount;
+    private Vector3 targetPosition;
+
+    void OnEnable() {
+        transform.position = new Vector3(transform.position.x, transform.position.y, parallaxModifier.x * 10);
+    }
+
+    void Start()
+    {
+        thisArea = gameObject.transform.parent.gameObject.transform.parent.gameObject;
+        
+        cam = Camera.main.transform;
+        cameraFollow = cam.GetComponent<CameraFollow>();
+        camStartPos = cam.position;
+
+        originalPos = transform.position;
+        length = GetComponent<SpriteRenderer>().bounds.size;
+    }
+
+    void LateUpdate()
+    {
+        if(GameManager.instance.playerArea==thisArea) {
+            if(!active) {
+                SetEnabled(true);
+                areaBounds = cameraFollow.GetBoundaries();
+                startPos = originalPos;
+                camStartPos.x = areaBounds.min.x + (camSize.x / 2);
+                camStartPos.y = areaBounds.min.y + cameraFollow.GetCameraSize().y / 2;
+            }
+        } else {
+            SetEnabled(false);
+        }
+
+        if(active)
+            HandleParallax();
+    }
+
+    void HandleParallax() {
+        moveAmount = cam.position - camStartPos;
+
+        if(autoScroll) {
+            Vector2 deltaMovement = ( (autoScrollSpeed * parallaxModifier) - autoScrollSpeed ) * Time.deltaTime;
+            startPos += (Vector3)deltaMovement;
+        }
+
+        targetPosition = (Vector2)startPos + (moveAmount * parallaxModifier);
+        transform.position = new Vector3(targetPosition.x, targetPosition.y, transform.position.z);
+
+        if(infiniteScroll) {
+            Vector3 persistentDistance = originalPos - camStartPos;
+            float frontOfSprite = transform.position.x + length.x/2;
+            float backOfSprite = transform.position.x - length.x/2;
+
+            float frontOfCamera = cam.position.x + camSize.x/2;
+            float backOfCamera = cam.position.x - camSize.x/2;
+
+            if(frontOfSprite < backOfCamera + 10f + persistentDistance.x) {
+                startPos.x += length.x;
+            }
+            else if(backOfCamera + 10f < backOfSprite - persistentDistance.x) {
+                startPos.x -= length.x;
+            }
+        }
+    }
+
+    void SetEnabled(bool i) {
+        active = i;
+        GetComponent<SpriteRenderer>().enabled = i;
     }
 }

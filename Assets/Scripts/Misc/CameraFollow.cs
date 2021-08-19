@@ -3,30 +3,34 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.U2D;
 
+[RequireComponent(typeof(PixelPerfectCamera))]
 public class CameraFollow : MonoBehaviour
 {
+    public struct CameraLimits {
+        public float minX, maxX;
+        public float minY, maxY;
+    }
+
     PixelPerfectCamera ppCamera;
+    Vector2 cameraSize;
 
     public Transform follow;
     Vector3 targetPosition;
     
     Bounds areaBounds = new Bounds();
-    float maxXPosition = Mathf.Infinity;
-    float maxYPosition = Mathf.Infinity;
-    float minXPosition = -Mathf.Infinity;
-    float minYPosition = -Mathf.Infinity;
 
-    float pixelsPerUnit;
-    float horzSize;
-    float vertSize;
+    public CameraLimits cameraLimits;
 
     float cameraTransitionTimer;
     
     void Start() {
+        cameraLimits.minX = -Mathf.Infinity;
+        cameraLimits.maxX= Mathf.Infinity;
+        cameraLimits.minY = -Mathf.Infinity;
+        cameraLimits.maxY = Mathf.Infinity;
+
         ppCamera = GetComponent<PixelPerfectCamera>();
-        pixelsPerUnit = ppCamera.assetsPPU;
-        horzSize = ppCamera.refResolutionX;
-        vertSize = ppCamera.refResolutionY;
+        cameraSize = GetCameraSize();
     }
 
     void Update()
@@ -39,13 +43,13 @@ public class CameraFollow : MonoBehaviour
         }
 
         targetPosition = new Vector3(follow.position.x, follow.position.y, transform.position.z);
-        targetPosition.x = Mathf.Round(targetPosition.x * pixelsPerUnit) / pixelsPerUnit;
-        targetPosition.y = Mathf.Round(targetPosition.y * pixelsPerUnit) / pixelsPerUnit;
+        targetPosition.x = Mathf.Round(targetPosition.x * ppCamera.assetsPPU) / ppCamera.assetsPPU;
+        targetPosition.y = Mathf.Round(targetPosition.y * ppCamera.assetsPPU) / ppCamera.assetsPPU;
 
-        targetPosition.x = (targetPosition.x <= minXPosition) ? minXPosition : targetPosition.x;
-        targetPosition.x = (targetPosition.x >= maxXPosition) ? maxXPosition : targetPosition.x;
-        targetPosition.y = (targetPosition.y <= minYPosition) ? minYPosition : targetPosition.y;
-        targetPosition.y = (targetPosition.y >= maxYPosition) ? maxYPosition : targetPosition.y;
+        targetPosition.x = (targetPosition.x <= cameraLimits.minX) ? cameraLimits.minX : targetPosition.x;
+        targetPosition.x = (targetPosition.x >= cameraLimits.maxX) ? cameraLimits.maxX : targetPosition.x;
+        targetPosition.y = (targetPosition.y <= cameraLimits.minY) ? cameraLimits.minY : targetPosition.y;
+        targetPosition.y = (targetPosition.y >= cameraLimits.maxY) ? cameraLimits.maxY : targetPosition.y;
 
         transform.position = targetPosition;
     }
@@ -53,10 +57,10 @@ public class CameraFollow : MonoBehaviour
     public void SetBoundaries(Bounds cameraBounds) {
         UIManager.instance.animator.Play("CrossFade_start");
 
-        minXPosition = cameraBounds.min.x + (horzSize / pixelsPerUnit) / 2;
-        maxXPosition = cameraBounds.max.x - (horzSize / pixelsPerUnit) / 2;
-        minYPosition = cameraBounds.min.y + (vertSize / pixelsPerUnit) / 2;
-        maxYPosition = cameraBounds.max.y - (vertSize / pixelsPerUnit) / 2;
+        cameraLimits.minX = cameraBounds.min.x + cameraSize.x / 2;
+        cameraLimits.maxX = cameraBounds.max.x - cameraSize.x / 2;
+        cameraLimits.minY = cameraBounds.min.y + cameraSize.y / 2;
+        cameraLimits.maxY = cameraBounds.max.y - cameraSize.y / 2;
 
         areaBounds = cameraBounds;
 
@@ -66,5 +70,13 @@ public class CameraFollow : MonoBehaviour
 
     public Bounds GetBoundaries() {
         return areaBounds;
+    }
+
+    public Vector2 GetCameraSize() {
+        float pixelsPerUnit = ppCamera.assetsPPU;
+        float horzSize = ppCamera.refResolutionX;
+        float vertSize = ppCamera.refResolutionY;
+
+        return new Vector2(horzSize/pixelsPerUnit, vertSize/pixelsPerUnit);
     }
 }
