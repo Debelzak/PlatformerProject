@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AreaManager : MonoBehaviour
 {
-    CameraFollow cameraFollow;
+    CameraManager cameraManager;
     GameObject player;
     Vector3 playerPosition;
     Bounds currentCameraBounds;
@@ -14,9 +14,9 @@ public class AreaManager : MonoBehaviour
     {
         player = GameObject.FindWithTag("Player");
         cameraBounds = GetComponent<BoxCollider2D>().bounds;
-        cameraFollow = Camera.main.GetComponent<CameraFollow>();
-
-        cameraFollow.SetBoundaries(cameraBounds);
+        cameraManager = Camera.main.GetComponent<CameraManager>();
+        
+        cameraManager.SetBoundaries(cameraBounds);
     }
 
     void Update()
@@ -30,7 +30,7 @@ public class AreaManager : MonoBehaviour
         {
             if(GameManager.instance.playerArea != this.gameObject) {
                 GameManager.instance.playerArea = this.gameObject;
-                cameraFollow.SetBoundaries(cameraBounds);
+                cameraManager.SetBoundaries(cameraBounds);
             };
         }
     }

@@ -39,12 +39,20 @@
      <Compile Include="Assets\Scripts\Misc\Parallax.cs" />
      <Compile Include="Assets\Scripts\UI\DebugInfo.cs" />
      <Compile Include="Assets\Scripts\UI\Minimap.cs" />
+     <Compile Include="Assets\Scripts\_ScriptableObjects\Enemy.cs" />
+     <Compile Include="Assets\Scripts\Enemy\EnemyAI.cs" />
      <Compile Include="Assets\Scripts\Level\OneWayPlatform.cs" />
      <Compile Include="Assets\Scripts\Player\Player.cs" />
      <Compile Include="Assets\Scripts\Misc\GameManager.cs" />
-     <Compile Include="Assets\Scripts\Misc\CameraFollow.cs" />
+     <Compile Include="Assets\Scripts\Enemy\EnemyScript.cs" />
+     <Compile Include="Assets\Scripts\Misc\CameraManager.cs" />
      <Compile Include="Assets\Scripts\UI\UIManager.cs" />
      <Compile Include="Assets\Scripts\Misc\AreaManager.cs" />
+     <Compile Include="Assets\Scripts\Player\State.cs" />
+     <Compile Include="Assets\Scripts\Player\States\IdleState.cs" />
+     <Compile Include="Assets\Scripts\Player\States\JumpState.cs" />
+     <Compile Include="Assets\Scripts\Player\States\WalkState.cs" />
+     <Compile Include="Assets\Scripts\Player\States\FallState.cs" />
     <Reference Include="UnityEngine">
         <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>

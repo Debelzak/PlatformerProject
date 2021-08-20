@@ -11,49 +11,42 @@ public class Parallax : MonoBehaviour
     [Range(-1.0f,1.0f)]
     public float YModifier;
 
-    private Vector2 parallaxModifier 
-    {
-        get {
-            return new Vector2(XModifier, YModifier);
-        }
-    }
-
     [Header("Options")]
     public bool infiniteScroll;
     public bool autoScroll;
     public Vector2 autoScrollSpeed;
 
     //Private
+    private Vector2 parallaxModifier 
+    {
+        get {return new Vector2(XModifier, YModifier);}
+    }
     private bool active;
-
     private GameObject thisArea;
-    private Transform cam;
-    private CameraFollow cameraFollow;
-    private Vector3 camSize => cameraFollow.GetCameraSize();
-    private Vector3 camStartPos;
     private Bounds areaBounds;
 
-    private Vector3 originalPos;
-    private Vector3 startPos;
-    private Vector3 length;
+        //Camera info
+    private Transform cam;
+    private Vector3 camStartPos;
+    private CameraManager cameraManager;
+    private Vector3 camSize => cameraManager.GetCameraSize();
 
-    private Vector2 moveAmount;
-    private Vector3 targetPosition;
-
-    void OnEnable() {
-        transform.position = new Vector3(transform.position.x, transform.position.y, parallaxModifier.x * 10);
-    }
+        //Parallax Sprite info and source position
+    private Vector3 startPos, nextPos, length;
+    private Vector3 moveAmount, targetPosition;
 
     void Start()
     {
-        thisArea = gameObject.transform.parent.gameObject.transform.parent.gameObject;
+        thisArea = GetComponentInParent<AreaManager>().gameObject;
         
         cam = Camera.main.transform;
-        cameraFollow = cam.GetComponent<CameraFollow>();
+        cameraManager = cam.GetComponent<CameraManager>();
         camStartPos = cam.position;
 
-        originalPos = transform.position;
+        startPos = transform.position;
         length = GetComponent<SpriteRenderer>().bounds.size;
+
+        transform.position = new Vector3(transform.position.x, transform.position.y, parallaxModifier.x * 10);
     }
 
     void LateUpdate()
@@ -61,10 +54,10 @@ public class Parallax : MonoBehaviour
         if(GameManager.instance.playerArea==thisArea) {
             if(!active) {
                 SetEnabled(true);
-                areaBounds = cameraFollow.GetBoundaries();
-                startPos = originalPos;
+                areaBounds = cameraManager.GetBoundaries();
+                nextPos = startPos;
                 camStartPos.x = areaBounds.min.x + (camSize.x / 2);
-                camStartPos.y = areaBounds.min.y + cameraFollow.GetCameraSize().y / 2;
+                camStartPos.y = areaBounds.min.y + cameraManager.GetCameraSize().y / 2;
             }
         } else {
             SetEnabled(false);
@@ -79,25 +72,25 @@ public class Parallax : MonoBehaviour
 
         if(autoScroll) {
             Vector2 deltaMovement = ( (autoScrollSpeed * parallaxModifier) - autoScrollSpeed ) * Time.deltaTime;
-            startPos += (Vector3)deltaMovement;
+            nextPos += (Vector3)deltaMovement;
         }
 
-        targetPosition = (Vector2)startPos + (moveAmount * parallaxModifier);
-        transform.position = new Vector3(targetPosition.x, targetPosition.y, transform.position.z);
+        targetPosition = (Vector2)nextPos + (moveAmount * parallaxModifier);
+        transform.position = cameraManager.RoundToPixel(new Vector3(targetPosition.x, targetPosition.y, transform.position.z));
 
         if(infiniteScroll) {
-            Vector3 persistentDistance = originalPos - camStartPos;
+            Vector3 initialDistance = startPos - camStartPos;
             float frontOfSprite = transform.position.x + length.x/2;
             float backOfSprite = transform.position.x - length.x/2;
 
             float frontOfCamera = cam.position.x + camSize.x/2;
             float backOfCamera = cam.position.x - camSize.x/2;
 
-            if(frontOfSprite < backOfCamera + 10f + persistentDistance.x) {
-                startPos.x += length.x;
+            if(frontOfSprite < backOfCamera + initialDistance.x) {
+                nextPos.x += length.x;
             }
-            else if(backOfCamera + 10f < backOfSprite - persistentDistance.x) {
-                startPos.x -= length.x;
+            else if(backOfCamera < backOfSprite - initialDistance.x) {
+                nextPos.x -= length.x;
             }
         }
     }

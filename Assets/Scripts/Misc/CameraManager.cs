@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.U2D;
 
 [RequireComponent(typeof(PixelPerfectCamera))]
-public class CameraFollow : MonoBehaviour
+public class CameraManager : MonoBehaviour
 {
     public struct CameraLimits {
         public float minX, maxX;
@@ -42,9 +42,7 @@ public class CameraFollow : MonoBehaviour
             cameraTransitionTimer -= Time.unscaledDeltaTime;
         }
 
-        targetPosition = new Vector3(follow.position.x, follow.position.y, transform.position.z);
-        targetPosition.x = Mathf.Round(targetPosition.x * ppCamera.assetsPPU) / ppCamera.assetsPPU;
-        targetPosition.y = Mathf.Round(targetPosition.y * ppCamera.assetsPPU) / ppCamera.assetsPPU;
+        targetPosition = RoundToPixel(new Vector3(follow.position.x, follow.position.y, transform.position.z));
 
         targetPosition.x = (targetPosition.x <= cameraLimits.minX) ? cameraLimits.minX : targetPosition.x;
         targetPosition.x = (targetPosition.x >= cameraLimits.maxX) ? cameraLimits.maxX : targetPosition.x;
@@ -78,5 +76,15 @@ public class CameraFollow : MonoBehaviour
         float vertSize = ppCamera.refResolutionY;
 
         return new Vector2(horzSize/pixelsPerUnit, vertSize/pixelsPerUnit);
+    }
+
+    public Vector3 RoundToPixel(Vector3 vector) {
+        Vector3 result = Vector3.zero;
+
+        result.x = Mathf.Round(vector.x * ppCamera.assetsPPU) / ppCamera.assetsPPU;
+        result.y = Mathf.Round(vector.y * ppCamera.assetsPPU) / ppCamera.assetsPPU;
+        result.z = vector.z;
+
+        return result;
     }
 }
