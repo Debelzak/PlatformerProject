@@ -74,8 +74,8 @@
      <Compile Include="Assets\SuperTiled2Unity\Scripts\Editor\ThirdParty\LibTessDotNet\PriorityQueue.cs" />
      <Compile Include="Assets\SuperTiled2Unity\Scripts\Editor\Importers\TsxAssetImporterEditor.cs" />
      <Compile Include="Assets\SuperTiled2Unity\Scripts\Editor\Extensions\AppDomainExtensions.cs" />
-     <Compile Include="Assets\SuperTiled2Unity\Scripts\Editor\StringConstants.cs" />
      <Compile Include="Assets\SuperTiled2Unity\Scripts\Editor\Loaders\TilesetLoader.cs" />
+     <Compile Include="Assets\SuperTiled2Unity\Scripts\Editor\StringConstants.cs" />
      <Compile Include="Assets\SuperTiled2Unity\Scripts\Editor\Importers\SuperImportContext.cs" />
      <Compile Include="Assets\SuperTiled2Unity\Scripts\Editor\ThirdParty\LibTessDotNet\Tess.cs" />
      <Compile Include="Assets\SuperTiled2Unity\Scripts\Editor\Collision\Geometry\Math.cs" />
@@ -109,8 +109,8 @@
      <Compile Include="Assets\SuperTiled2Unity\Scripts\Editor\Settings\LayerMaterialMatch.cs" />
      <Compile Include="Assets\SuperTiled2Unity\Scripts\Editor\Config\SuperTiled2Unity_Config.cs" />
      <Compile Include="Assets\SuperTiled2Unity\Scripts\Editor\Importers\SuperImporterEditor.cs" />
-     <Compile Include="Assets\SuperTiled2Unity\Scripts\Editor\Postprocessors\SuperTexturePostprocessor.cs" />
      <Compile Include="Assets\SuperTiled2Unity\Scripts\Editor\Math\ColliderFactory.cs" />
+     <Compile Include="Assets\SuperTiled2Unity\Scripts\Editor\Postprocessors\SuperTexturePostprocessor.cs" />
      <Compile Include="Assets\SuperTiled2Unity\Scripts\Editor\Collision\TilePolygon.cs" />
      <Compile Include="Assets\SuperTiled2Unity\Scripts\Editor\GUI\GuiScopedIndent.cs" />
      <Compile Include="Assets\SuperTiled2Unity\Scripts\Editor\ThirdParty\clipper.cs" />

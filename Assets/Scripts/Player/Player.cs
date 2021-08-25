@@ -58,6 +58,12 @@ namespace Deb.Player
             animator = GetComponent<Animator>();
         }
 
+        private void Start()
+        {
+            rigidBody.gravityScale = gravityScale;
+            SetState(idleState);
+        }
+
         private void Update()
         {
             velocity = new Vector2(Mathf.Round(rigidBody.velocity.x * 100f) / 100f, Mathf.Round(rigidBody.velocity.y * 100f) / 100f);
