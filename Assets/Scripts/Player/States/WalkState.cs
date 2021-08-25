@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Deb.PlayerState
+namespace Deb.Player.States
 {
     public class WalkState : State 
     {

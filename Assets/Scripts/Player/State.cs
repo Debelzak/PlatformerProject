@@ -1,4 +1,4 @@
-namespace Deb.PlayerState
+namespace Deb.Player.States
 {
     public abstract class State
     {
