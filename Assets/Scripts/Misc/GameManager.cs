@@ -15,22 +15,28 @@ public class GameManager : MonoBehaviour
     //private
     private GameObject player;
 
-    void Awake()
+    void Start()
     {
-        if(instance == null)
+        if(instance == null) {
             instance = this;
-        else if(instance != this)
-            Destroy(gameObject);
-            
-        DontDestroyOnLoad(gameObject);
-
+        } else if(instance != this){
+            Destroy(this.gameObject);
+        }
+        
         player = GameObject.FindGameObjectWithTag("Player");
+        
+        Setup();
     }
 
-    void Update() {
+    void FixedUpdate() {
         playerLocation = player.transform.position;
 
         mapPositionX = (int)(player.transform.position.x / 20);
         mapPositionY = (int)(player.transform.position.y / 12);
+    }
+
+    void Setup()
+    {
+        Application.targetFrameRate = 60;
     }
 }

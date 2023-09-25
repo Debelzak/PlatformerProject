@@ -1,34 +1,32 @@
 using UnityEngine;
 
-namespace Deb.Player.States
+public static class IdleState
 {
-    public class IdleState : State
+    public static void OnEnterState(Player player)
     {
-        public override void OnEnterState(Player player)
+        player.animator.Play("Idle");
+    }
+
+    public static void OnUpdate(Player player)
+    {
+        if(Input.GetAxisRaw("Horizontal") != 0)
         {
-            player.animator.Play("Idle");
+            player.State.Set(player, (int)PlayerState.Type.STATE_WALK);
         }
 
-        public override void Update(Player player)
+        if(Input.GetButtonDown("Jump") && Input.GetAxisRaw("Vertical") != -1)   //Add timer to when is grounded jump right away.
         {
-            if(Input.GetAxisRaw("Horizontal") != 0)
-            {
-                player.SetState(player.walkState);
-            }
-
-            if(Input.GetButtonDown("Jump") && Input.GetAxisRaw("Vertical") != -1)   //Add timer to when is grounded jump right away.
-            {
-                player.SetState(player.jumpState);
-            }
-
-            if(player.velocity.y < -2.0f) {
-                player.SetState(player.fallState);
-            }
+            player.State.Set(player, (int)PlayerState.Type.STATE_JUMP);
         }
 
-        public override void FixedUpdate(Player player)
+        if(!player.isGrounded && player.physics.velocity.y < 0)
         {
-            
+            player.State.Set(player, (int)PlayerState.Type.STATE_FALL);
         }
+    }
+
+    public static void OnFixedUpdate(Player player)
+    {
+        
     }
 }

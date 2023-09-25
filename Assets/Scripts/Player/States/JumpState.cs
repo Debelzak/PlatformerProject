@@ -1,42 +1,35 @@
 using UnityEngine;
 
-namespace Deb.Player.States
+public static class JumpState
 {
-    public class JumpState : State
+    public static void OnEnterState(Player player)
     {
-        private float horizontalInput;
+        player.animator.Play("Jump");
+        player.physics.velocity = new Vector2(player.physics.velocity.x, player.maxJumpForce);
+    }
 
-        public override void OnEnterState(Player player)
+    public static void OnUpdate(Player player)
+    {
+        float horizontalInput = Input.GetAxisRaw("Horizontal");
+
+        if(player.physics.velocity.y > player.minJumpForce && Input.GetButtonUp("Jump"))
         {
-            player.animator.Play("Jump");
-            player.rigidBody.velocity = new Vector2(player.rigidBody.velocity.x, player.maxJumpForce);
+            player.physics.velocity.y = player.minJumpForce;
         }
 
-        public override void Update(Player player)
+        if(player.isGrounded && player.physics.velocity.y == 0)
         {
-            horizontalInput = Input.GetAxisRaw("Horizontal");
-
-            if(player.isGrounded && player.velocity.y == 0)
-            {
-                player.SetState(player.idleState);
-            }
-
-            if(player.rigidBody.velocity.y < 0f && !player.isGrounded)
-            {
-                player.SetState(player.fallState);
-            }
-
-            //Jump cancel
-            if(player.rigidBody.velocity.y > player.minJumpForce && Input.GetButtonUp("Jump"))
-            {
-                player.rigidBody.velocity = new Vector2(player.rigidBody.velocity.x, player.minJumpForce);
-            }
+            player.State.Set(player, (int)PlayerState.Type.STATE_IDLE);
         }
 
-        public override void FixedUpdate(Player player)
+        if(player.physics.velocity.y < 0f && !player.isGrounded)
         {
-            //Apply horizontal movement
-            player.rigidBody.velocity = new Vector2(player.moveSpeed * horizontalInput, player.rigidBody.velocity.y);
+            player.State.Set(player, (int)PlayerState.Type.STATE_FALL);
         }
+    }
+
+    public static void OnFixedUpdate(Player player)
+    {
+
     }
 }

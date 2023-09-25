@@ -40,7 +40,7 @@ public class Parallax : MonoBehaviour
         thisArea = GetComponentInParent<AreaManager>().gameObject;
         
         cam = Camera.main.transform;
-        cameraManager = cam.GetComponent<CameraManager>();
+        cameraManager = CameraManager.Instance;
         camStartPos = cam.position;
 
         startPos = transform.position;

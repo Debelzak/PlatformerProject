@@ -1,50 +1,43 @@
 using UnityEngine;
 
-namespace Deb.Player.States
+public class WalkState
 {
-    public class WalkState : State 
+    public static void OnEnterState(Player player)
     {
-        private float horizontalInput;
-        private float verticalInput;
+        player.animator.Play("Walk");
+    }
 
-        public override void OnEnterState(Player player)
+    public static void OnUpdate(Player player)
+    {
+        float horizontalInput = Input.GetAxisRaw("Horizontal");
+        float verticalInput = Input.GetAxisRaw("Vertical");
+
+        //Animation
+        if(!player.footDustEffect.isEmitting)
         {
-            player.animator.Play("Walk");
+            player.footDustEffect.Play();
         }
 
-        public override void Update(Player player)
+        //Handler
+        if(horizontalInput == 0)
         {
-            horizontalInput = Input.GetAxisRaw("Horizontal");
-            verticalInput = Input.GetAxisRaw("Vertical");
-
-            //Animation
-            if(!player.footDustEffect.isEmitting)
-            {
-                player.footDustEffect.Play();
-            }
-
-            //Handler
-            if(horizontalInput == 0)
-            {
-                player.rigidBody.velocity = new Vector2(0, player.rigidBody.velocity.y);
-                player.SetState(player.idleState);
-            }
-
-            if(Input.GetButtonDown("Jump") && Input.GetAxisRaw("Vertical") != -1)
-            {
-                player.SetState(player.jumpState);
-            }
-
-            if(player.velocity.y < -2.0f && !player.isGrounded)
-            {
-                player.SetState(player.fallState);
-            }
+            player.physics.velocity = new Vector2(0, player.physics.velocity.y);
+            player.State.Set(player, (int)PlayerState.Type.STATE_IDLE);
         }
 
-        public override void FixedUpdate(Player player)
+        if(Input.GetButtonDown("Jump") && Input.GetAxisRaw("Vertical") != -1)
         {
-            //Apply horizontal movement
-            player.rigidBody.velocity = new Vector2(player.moveSpeed * horizontalInput, player.rigidBody.velocity.y);
+            player.State.Set(player, (int)PlayerState.Type.STATE_JUMP);
         }
+
+        if(player.physics.velocity.y < 0f && !player.isGrounded)
+        {
+            player.State.Set(player, (int)PlayerState.Type.STATE_FALL);
+        }
+    }
+
+    public static void OnFixedUpdate(Player player)
+    {
+        
     }
 }

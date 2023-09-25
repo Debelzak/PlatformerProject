@@ -7,14 +7,13 @@ public class AreaManager : MonoBehaviour
     CameraManager cameraManager;
     GameObject player;
     Vector3 playerPosition;
-    Bounds currentCameraBounds;
     Bounds cameraBounds;
 
     void Start()
     {
         player = GameObject.FindWithTag("Player");
         cameraBounds = GetComponent<BoxCollider2D>().bounds;
-        cameraManager = Camera.main.GetComponent<CameraManager>();
+        cameraManager = CameraManager.Instance;
         
         cameraManager.SetBoundaries(cameraBounds);
     }
@@ -36,6 +35,7 @@ public class AreaManager : MonoBehaviour
     }
 
     void OnDrawGizmos() {
+        Gizmos.color = Color.blue;
         //Horizontal lines
         Gizmos.DrawLine(new Vector2(cameraBounds.min.x, cameraBounds.max.y), new Vector2(cameraBounds.max.x, cameraBounds.max.y));
         Gizmos.DrawLine(new Vector2(cameraBounds.min.x, cameraBounds.min.y), new Vector2(cameraBounds.max.x, cameraBounds.min.y));

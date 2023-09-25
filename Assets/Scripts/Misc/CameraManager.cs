@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.U2D;
 
-[RequireComponent(typeof(PixelPerfectCamera))]
 public class CameraManager : MonoBehaviour
 {
+    public static CameraManager Instance;
+
     public struct CameraLimits {
         public float minX, maxX;
         public float minY, maxY;
     }
 
-    PixelPerfectCamera ppCamera;
+    public GameObject playerCamera;
+
+    public PixelPerfectCamera ppCamera {get; private set;}
     Vector2 cameraSize;
 
     public Transform follow;
@@ -24,12 +27,19 @@ public class CameraManager : MonoBehaviour
     float cameraTransitionTimer;
     
     void Start() {
+        if(Instance == null) {
+            Instance = this;
+        } else {
+            Destroy(this);
+        }
+
         cameraLimits.minX = -Mathf.Infinity;
         cameraLimits.maxX= Mathf.Infinity;
         cameraLimits.minY = -Mathf.Infinity;
         cameraLimits.maxY = Mathf.Infinity;
 
-        ppCamera = GetComponent<PixelPerfectCamera>();
+        ppCamera = playerCamera.GetComponent<PixelPerfectCamera>();
+
         cameraSize = GetCameraSize();
     }
 
@@ -49,7 +59,7 @@ public class CameraManager : MonoBehaviour
         targetPosition.y = (targetPosition.y <= cameraLimits.minY) ? cameraLimits.minY : targetPosition.y;
         targetPosition.y = (targetPosition.y >= cameraLimits.maxY) ? cameraLimits.maxY : targetPosition.y;
 
-        transform.position = targetPosition;
+        playerCamera.transform.position = targetPosition;
     }
 
     public void SetBoundaries(Bounds cameraBounds) {

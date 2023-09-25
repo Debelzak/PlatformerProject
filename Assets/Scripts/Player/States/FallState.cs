@@ -1,36 +1,34 @@
 using UnityEngine;
 
-namespace Deb.Player.States
+public class FallState
 {
-    public class FallState : State
+    public static void OnEnterState(Player player)
     {
-        private float horizontalInput;
+        player.animator.Play("Fall");
+    }
 
-        public override void OnEnterState(Player player)
+    public static void OnUpdate(Player player)
+    {
+        float horizontalInput = Input.GetAxisRaw("Horizontal");
+
+        if(player.isGrounded)
         {
-            player.animator.Play("Fall");
-        }
-
-        public override void Update(Player player)
-        {
-            horizontalInput = Input.GetAxisRaw("Horizontal");
-
-            if(player.isGrounded && player.velocity.y == 0)
+            player.State.Set(player, (int)PlayerState.Type.STATE_IDLE);
+            if(horizontalInput != 0)
             {
-                player.SetState(player.idleState);
-            }
-
-            //Animation
-            if(!player.wasGroundedLastFrame && player.isGrounded)
-            {
-                player.footImpactEffect.Play();
+                player.State.Set(player, (int)PlayerState.Type.STATE_WALK);
             }
         }
 
-        public override void FixedUpdate(Player player)
+        //Animation
+        if(!player.wasGroundedLastFrame && player.isGrounded)
         {
-            //Apply horizontal movement
-            player.rigidBody.velocity = new Vector2(player.moveSpeed * horizontalInput, player.rigidBody.velocity.y);
+            player.footImpactEffect.Play();
         }
+    }
+
+    public static void OnFixedUpdate(Player player)
+    {
+
     }
 }
